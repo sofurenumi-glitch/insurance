@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="ja" style="color-scheme: light">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="color-scheme" content="light">
+  <title>COVER Terminal</title>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Serif+JP:wght@300;400;500&family=Cormorant+Garamond:ital,wght@0,300;0,400;1,300;1,400&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    :root {
+      color-scheme: light;
+      --cream: #F4F6F8;
+      --navy: #2A3042;
+      --navy-mid: #566078;
+      --navy-light: #96A2B8;
+      --navy-pale: #D0D8E8;
+      --accent: #4A6FA8;
+      --accent-dark: #344E7A;
+      --accent-light: #DDE6F4;
+      --blue: #5A80B8;
+      --card: #F8FAFC;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --cream: #F4F6F8;
+        --navy: #2A3042;
+        --navy-mid: #566078;
+        --navy-light: #96A2B8;
+        --navy-pale: #D0D8E8;
+        --accent: #4A6FA8;
+        --accent-dark: #344E7A;
+        --accent-light: #DDE6F4;
+        --blue: #5A80B8;
+        --card: #F8FAFC;
+      }
+    }
+
+    body {
+      background: var(--cream);
+      background-color: #F4F6F8 !important;
+      color: var(--navy);
+      color: #2A3042 !important;
+      font-family: 'Noto Serif JP', Georgia, serif;
+      min-height: 100vh;
+    }
+
+    .screen { display: none; min-height: 100vh; align-items: center; justify-content: center; padding: 48px 24px; flex-direction: column; }
+    .screen.active { display: flex; }
+
+    .container { max-width: 460px; width: 100%; }
+    .container-wide { max-width: 600px; width: 100%; margin: 0 auto; padding: 64px 24px; }
+
+    .eyebrow { font-family: 'Cormorant Garamond', serif; font-size: 10px; letter-spacing: 5px; color: var(--blue); text-transform: uppercase; margin-bottom: 20px; }
+
+    .logo { font-family: 'Cormorant Garamond', serif; font-size: 52px; font-weight: 300; color: var(--navy); letter-spacing: 2px; line-height: 1; margin-bottom: 4px; text-align: center; }
+    .logo-sub { font-family: 'Cormorant Garamond', serif; font-size: 13px; letter-spacing: 10px; color: var(--blue); margin-bottom: 44px; text-align: center; }
+    .divider { width: 1px; height: 56px; background: linear-gradient(to bottom, transparent, var(--navy-pale), transparent); margin: 0 auto 44px; }
+
+    .body-text { color: var(--navy-mid); font-size: 14px; line-height: 2.4; margin-bottom: 44px; font-weight: 300; text-align: center; }
+    .italic { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--blue); font-size: 13px; }
+
+    .btn { background: var(--accent); border: none; color: #F4F6F8; padding: 15px 48px; font-size: 11px; letter-spacing: 4px; cursor: pointer; font-family: 'Noto Serif JP', serif; transition: background 0.3s; width: 100%; border-radius: 4px; }
+    .btn:hover { background: var(--accent-dark); }
+    .btn:disabled { background: var(--navy-pale); color: var(--navy-light); cursor: default; }
+    .btn-sm { width: auto; padding: 14px 36px; }
+    .btn-outline { background: transparent; border: 1px solid var(--navy-pale); color: var(--accent); padding: 13px 40px; font-size: 11px; letter-spacing: 3px; cursor: pointer; font-family: 'Noto Serif JP', serif; transition: all 0.3s; border-radius: 4px; }
+    .btn-outline:hover { border-color: var(--accent); color: var(--navy); }
+
+    .field { margin-bottom: 32px; }
+    .label { font-size: 10px; letter-spacing: 3px; color: var(--navy-light); display: block; margin-bottom: 12px; text-transform: uppercase; }
+    .input { background: transparent; border: none; border-bottom: 1px solid var(--navy-pale); color: var(--navy); padding: 10px 0; font-size: 15px; outline: none; font-family: 'Noto Serif JP', serif; transition: border-color 0.3s; width: 100%; }
+    .input:focus { border-bottom-color: var(--accent); }
+    .input::placeholder { color: var(--navy-pale); }
+    .textarea { background: transparent; border: none; border-bottom: 1px solid var(--navy-pale); color: var(--navy); padding: 12px 0; font-size: 15px; outline: none; resize: none; font-family: 'Noto Serif JP', serif; line-height: 2; width: 100%; transition: border-color 0.3s; }
+    .textarea:focus { border-bottom-color: var(--accent); }
+    .textarea::placeholder { color: var(--navy-pale); }
+    .hint { color: var(--navy-light); font-size: 12px; margin-top: 8px; font-style: italic; font-family: 'Cormorant Garamond', serif; }
+
+    /* stage chips */
+    .chip-wrap { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+    .chip { font-family: 'Cormorant Garamond', serif; font-size: 12px; letter-spacing: 1px; color: var(--navy-mid); border: 1px solid var(--navy-pale); padding: 6px 14px; cursor: pointer; transition: all 0.2s; background: transparent; font-style: italic; border-radius: 20px; }
+    .chip:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+    .chip.active { background: var(--accent); color: #F4F6F8; border-color: var(--accent); }
+
+    .progress { display: flex; gap: 6px; margin-bottom: 52px; }
+    .progress-bar { flex: 1; height: 1px; transition: background 0.4s; }
+
+    .question { font-size: 19px; line-height: 1.9; color: var(--navy); margin-bottom: 10px; font-weight: 400; }
+    .question-hint { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--navy-light); font-size: 14px; margin-bottom: 32px; line-height: 1.8; }
+
+    .nav { display: flex; justify-content: space-between; align-items: center; margin-top: 36px; }
+    .back-btn { background: transparent; border: none; color: var(--navy-light); font-size: 12px; cursor: pointer; letter-spacing: 2px; font-family: 'Noto Serif JP', serif; transition: color 0.3s; padding: 8px 0; }
+    .back-btn:hover { color: var(--accent); }
+
+    .spinner { width: 36px; height: 36px; border: 1px solid var(--accent-light); border-top: 1px solid var(--accent); border-radius: 50%; animation: spin 1.4s linear infinite; margin: 0 auto 36px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loading-text { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--accent); font-size: 15px; letter-spacing: 2px; text-align: center; }
+
+    /* result */
+    .result-header { text-align: center; margin-bottom: 48px; }
+    .profile-card { background: var(--card); border-left: 2px solid var(--accent-light); padding: 22px 26px; margin-bottom: 48px; }
+    .profile-text { color: #3A4560; font-size: 14px; line-height: 2.3; font-weight: 300; }
+
+    /* 保障マップ */
+    .cover-section { margin-bottom: 40px; }
+    .cover-section-title { font-family: 'Cormorant Garamond', serif; font-size: 11px; letter-spacing: 4px; color: var(--navy-light); text-transform: uppercase; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 1px solid var(--accent-light); }
+
+    .cover-item { display: flex; gap: 18px; padding: 22px 0; border-bottom: 1px solid var(--accent-light); align-items: flex-start; }
+    .cover-priority { flex-shrink: 0; width: 44px; height: 44px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-family: 'Cormorant Garamond', serif; font-size: 11px; letter-spacing: 1px; }
+    .priority-high { background: var(--accent); color: #F4F6F8; }
+    .priority-mid { background: var(--accent-light); color: var(--accent-dark); }
+    .priority-low { background: var(--navy-pale); color: var(--navy-mid); }
+
+    .cover-type { font-size: 9px; letter-spacing: 3px; margin-bottom: 6px; text-transform: uppercase; font-family: 'Cormorant Garamond', serif; color: var(--accent); }
+    .cover-name { font-size: 17px; color: var(--navy); margin-bottom: 4px; line-height: 1.5; font-weight: 400; }
+    .cover-reason { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--navy-mid); font-size: 14px; line-height: 1.9; margin-bottom: 8px; }
+    .cover-point { font-size: 12px; color: var(--navy-light); line-height: 1.9; }
+
+    /* disclaimer */
+    .disclaimer { background: var(--accent-light); border-left: 2px solid var(--accent); padding: 18px 22px; margin: 48px 0 32px; }
+    .disclaimer-text { font-size: 12px; color: var(--navy-mid); line-height: 2; font-family: 'Cormorant Garamond', serif; font-style: italic; }
+
+    .footer { text-align: center; margin-top: 40px; padding-top: 44px; border-top: 1px solid var(--accent-light); }
+    .footer-text { font-family: 'Cormorant Garamond', serif; font-style: italic; color: var(--navy-light); font-size: 13px; margin-bottom: 28px; letter-spacing: 1px; }
+
+    .row { display: flex; gap: 12px; align-items: flex-end; }
+    .error-text { color: #B85A4A; font-size: 12px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div id="screen-intro" class="screen active">
+  <div class="container" style="text-align:center">
+    <div class="eyebrow">Insurance Guidance</div>
+    <div class="logo">COVER</div>
+    <div class="logo-sub">Terminal</div>
+    <div class="divider"></div>
+    <p class="body-text">
+      3つの質問に答えるだけで、<br>
+      今のあなたに必要な保障の地図が見えてきます。<br>
+      <span class="italic">不安を言葉にすると、備えが見えてくる。</span>
+    </p>
+    <button class="btn" onclick="showScreen('screen-pre')">はじめる</button>
+  </div>
+</div>
+
+<!-- PRE -->
+<div id="screen-pre" class="screen">
+  <div class="container">
+    <div class="eyebrow">Your situation</div>
+    <h2 style="font-size:20px;font-weight:400;margin-bottom:8px">まず、基本情報を教えてください。</h2>
+    <p class="italic" style="display:block;margin-bottom:44px;line-height:2">あなたの状況を、もう少し知らせてください。</p>
+
+    <div class="field">
+      <label class="label">年代</label>
+      <div class="chip-wrap" id="age-chips">
+        <button class="chip" onclick="setChip('age', '20代', this)">20代</button>
+        <button class="chip" onclick="setChip('age', '30代', this)">30代</button>
+        <button class="chip" onclick="setChip('age', '40代', this)">40代</button>
+        <button class="chip" onclick="setChip('age', '50代', this)">50代</button>
+        <button class="chip" onclick="setChip('age', '60代以上', this)">60代以上</button>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="label">家族構成</label>
+      <div class="chip-wrap" id="family-chips">
+        <button class="chip" onclick="setChip('family', '独身', this)">独身</button>
+        <button class="chip" onclick="setChip('family', '夫婦のみ', this)">夫婦のみ</button>
+        <button class="chip" onclick="setChip('family', '子どもあり', this)">子どもあり</button>
+        <button class="chip" onclick="setChip('family', '親の介護あり', this)">親の介護あり</button>
+      </div>
+    </div>
+
+    <div class="field" style="margin-bottom:44px">
+      <label class="label">今の保険加入状況</label>
+      <div class="chip-wrap" id="insurance-chips">
+        <button class="chip" onclick="setChip('insurance', 'ほぼ未加入', this)">ほぼ未加入</button>
+        <button class="chip" onclick="setChip('insurance', '会社の団体保険のみ', this)">会社の団体保険のみ</button>
+        <button class="chip" onclick="setChip('insurance', '何か入っているが内容不明', this)">入っているが内容不明</button>
+        <button class="chip" onclick="setChip('insurance', 'ある程度整っている', this)">ある程度整っている</button>
+      </div>
+    </div>
+
+    <button class="btn" id="btn-pre" onclick="startQuestions()" disabled>次へ進む</button>
+  </div>
+</div>
+
+<!-- QUESTIONS -->
+<div id="screen-questions" class="screen">
+  <div class="container">
+    <div class="progress" id="progress"></div>
+    <div class="eyebrow" id="q-label"></div>
+    <h2 class="question" id="q-text"></h2>
+    <p class="question-hint" id="q-hint"></p>
+    <textarea class="textarea" id="q-answer" rows="5" oninput="onAnswerInput()"></textarea>
+    <div style="margin-top:10px;min-height:20px;display:flex;justify-content:space-between;align-items:center">
+      <span id="depth-msg" style="font-family:'Cormorant Garamond',serif;font-style:italic;font-size:12px;color:var(--navy-light);transition:color 0.4s"></span>
+      <span id="char-count" style="font-family:'Cormorant Garamond',serif;font-size:11px;color:var(--navy-pale);letter-spacing:1px"></span>
+    </div>
+    <p class="error-text" id="q-error" style="display:none"></p>
+    <div class="nav">
+      <button class="back-btn" onclick="prevQuestion()">← 戻る</button>
+      <button class="btn btn-sm" id="btn-next" onclick="nextQuestion()" disabled>次へ →</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOADING -->
+<div id="screen-loading" class="screen">
+  <div>
+    <div class="spinner"></div>
+    <p class="loading-text" id="loading-text">あなたの状況を読んでいます…</p>
+  </div>
+</div>
+
+<!-- RESULT -->
+<div id="screen-result" class="screen" style="align-items:flex-start">
+  <div class="container-wide">
+    <div class="result-header">
+      <div class="eyebrow">Your Coverage Map</div>
+      <h2 style="font-family:'Cormorant Garamond',serif;font-size:30px;font-weight:300">あなたの保障の地図</h2>
+    </div>
+
+    <div class="profile-card">
+      <p class="profile-text" id="result-profile"></p>
+    </div>
+
+    <!-- 優先度高 -->
+    <div class="cover-section">
+      <div class="cover-section-title">まず備えたい保障</div>
+      <div id="result-high"></div>
+    </div>
+
+    <!-- 優先度中 -->
+    <div class="cover-section">
+      <div class="cover-section-title">次に検討したい保障</div>
+      <div id="result-mid"></div>
+    </div>
+
+    <!-- 優先度低 -->
+    <div class="cover-section">
+      <div class="cover-section-title">余裕があれば考えたい保障</div>
+      <div id="result-low"></div>
+    </div>
+
+    <!-- 免責事項 -->
+    <div class="disclaimer">
+      <p class="disclaimer-text">
+        この結果はAIによる一般的な情報提供であり、保険の販売・勧誘・個別アドバイスではありません。
+        実際の保険加入にあたっては、保険代理店・FP・保険会社の専門家にご相談ください。
+      </p>
+    </div>
+
+    <div class="footer">
+      <p class="footer-text">備えることは、大切な人を守ることだ。</p>
+      <button class="btn-outline" onclick="reset()">もう一度整理する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  const preData = { age: '', family: '', insurance: '' };
+  const answers = { q1: '', q2: '', q3: '' };
+  let currentQ = 0;
+
+  // ── Pre screen ─────────────────────────────────────────
+  function setChip(group, val, el) {
+    preData[group] = val;
+    const groupMap = { age: 'age-chips', family: 'family-chips', insurance: 'insurance-chips' };
+    document.getElementById(groupMap[group]).querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    el.classList.add('active');
+    validatePre();
+  }
+
+  function validatePre() {
+    document.getElementById('btn-pre').disabled = !(preData.age && preData.family && preData.insurance);
+  }
+
+  // ── Questions ──────────────────────────────────────────
+  const QUESTIONS = [
+    {
+      id: 'q1', label: 'Q1　今の状況', num: 1,
+      question: '今の生活で、お金のことで一番「もしも」と感じる場面はどんな時ですか？',
+      hint: '病気、事故、仕事、家族のこと…なんでも思いつくままに。',
+      placeholder: '例：自分が入院したら家族が困る。収入が途絶えたら住宅ローンが払えない…'
+    },
+    {
+      id: 'q2', label: 'Q2　不安の正体', num: 2,
+      question: '今の自分にとって、一番「守りたい」ものは何ですか？',
+      hint: '人でも、生活でも、夢でも。具体的に思い浮かぶものを。',
+      placeholder: '例：子どもの教育費。今の生活水準。親に迷惑をかけないこと…'
+    },
+    {
+      id: 'q3', label: 'Q3　将来のイメージ', num: 3,
+      question: '5〜10年後、どんな生活をしていたいですか？',
+      hint: '具体的でなくていい。方向性だけでも。',
+      placeholder: '例：子どもが独立している。自分のビジネスを持っている。早めにリタイアしたい…'
+    }
+  ];
+
+  function showScreen(id) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    window.scrollTo(0, 0);
+  }
+
+  function startQuestions() {
+    currentQ = 0;
+    renderQuestion();
+    showScreen('screen-questions');
+  }
+
+  function renderQuestion() {
+    const q = QUESTIONS[currentQ];
+    const prog = document.getElementById('progress');
+    prog.innerHTML = QUESTIONS.map((_, i) =>
+      `<div class="progress-bar" style="background:${i <= currentQ ? '#4A6FA8' : '#D0D8E8'}"></div>`
+    ).join('');
+    document.getElementById('q-label').textContent = `${q.label}　${q.num} / ${QUESTIONS.length}`;
+    document.getElementById('q-text').textContent = q.question;
+    document.getElementById('q-hint').textContent = q.hint;
+    document.getElementById('q-error').style.display = 'none';
+    const ta = document.getElementById('q-answer');
+    ta.value = answers[q.id];
+    ta.placeholder = q.placeholder;
+    document.getElementById('depth-msg').textContent = '';
+    document.getElementById('char-count').textContent = '';
+    if (answers[q.id]) onAnswerInput();
+    const isLast = currentQ === QUESTIONS.length - 1;
+    const btn = document.getElementById('btn-next');
+    btn.textContent = isLast ? '保障の地図を見る' : '次へ →';
+    btn.disabled = !answers[q.id].trim();
+  }
+
+  function onAnswerInput() {
+    const q = QUESTIONS[currentQ];
+    const val = document.getElementById('q-answer').value;
+    answers[q.id] = val;
+    document.getElementById('btn-next').disabled = !val.trim();
+    const len = val.trim().length;
+    const msg = document.getElementById('depth-msg');
+    const cnt = document.getElementById('char-count');
+    cnt.textContent = len > 0 ? `${len}字` : '';
+    if (len === 0) { msg.textContent = ''; }
+    else if (len < 15) { msg.textContent = 'もう少し詳しく教えてもらえると、より的確な整理ができます。'; msg.style.color = 'var(--navy-light)'; }
+    else if (len < 50) { msg.textContent = 'あなたの状況が、少しずつ見えてきました。'; msg.style.color = 'var(--accent)'; }
+    else if (len < 120) { msg.textContent = '不安の輪郭が、だんだん明確になってきました。'; msg.style.color = 'var(--navy-mid)'; }
+    else { msg.textContent = 'よく伝わりました。この言葉から保障を整理します。'; msg.style.color = 'var(--navy)'; }
+  }
+
+  function prevQuestion() {
+    if (currentQ > 0) { currentQ--; renderQuestion(); }
+    else { showScreen('screen-pre'); }
+  }
+
+  function nextQuestion() {
+    if (currentQ < QUESTIONS.length - 1) { currentQ++; renderQuestion(); }
+    else { fetchCoverage(); }
+  }
+
+  // ── API ────────────────────────────────────────────────
+  function buildPrompt() {
+    return `あなたはCOVER Terminalという保障整理サービスのAIです。以下の情報をもとに、この人に今必要な保障の方向性を整理してください。
+
+【基本情報】
+年代：${preData.age}
+家族構成：${preData.family}
+現在の保険加入状況：${preData.insurance}
+
+【ヒアリング回答】
+Q1（もしもと感じる場面）：${answers.q1}
+Q2（守りたいもの）：${answers.q2}
+Q3（5〜10年後のイメージ）：${answers.q3}
+
+【整理のルール】
+- 具体的な保険商品名・保険会社名・保険料は絶対に挙げない
+- 「保障の種類」と「なぜ今この人に必要か」を整理する
+- 優先度を高・中・低の3段階で分類する
+- 各優先度に2〜3項目
+- 最後に必ず「専門家への相談を推奨する」旨を含める
+- 温かく、押しつけがましくない言葉で
+
+以下のJSON形式のみで返してください。前置きや説明は不要です。
+
+{
+  "profile": "この人の状況への2〜3文の整理（核心を突く、温かく的確な言葉で）",
+  "high": [
+    { "type": "保障の種類", "name": "保障の名称", "reason": "なぜ今この人に必要か（40字程度）", "point": "検討時に確認すべき点（30字程度）" }
+  ],
+  "mid": [
+    { "type": "保障の種類", "name": "保障の名称", "reason": "なぜこの人に必要か（40字程度）", "point": "検討時に確認すべき点（30字程度）" }
+  ],
+  "low": [
+    { "type": "保障の種類", "name": "保障の名称", "reason": "将来的に検討する理由（40字程度）", "point": "検討時に確認すべき点（30字程度）" }
+  ]
+}`;
+  }
+
+  const LOADING_TEXTS = [
+    'あなたの状況を読んでいます…',
+    '不安の正体を整理しています…',
+    '守りたいものを確認しています…',
+    '将来のイメージを読み取っています…',
+    '保障の地図を描いています…',
+    '見えてきました。'
+  ];
+
+  async function fetchCoverage() {
+    showScreen('screen-loading');
+    let i = 0;
+    document.getElementById('loading-text').textContent = LOADING_TEXTS[0];
+    const interval = setInterval(() => { i++; if (i < LOADING_TEXTS.length) document.getElementById('loading-text').textContent = LOADING_TEXTS[i]; }, 2000);
+    try {
+      const res = await fetch('/api/chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ messages: [{ role: 'user', content: buildPrompt() }] })
+      });
+      const data = await res.json();
+      clearInterval(interval);
+      if (data.error) throw new Error('APIエラー: ' + JSON.stringify(data.error));
+      if (!data.content) throw new Error('contentなし');
+      const text = data.content.map(b => b.text || '').join('');
+      const cleaned = text.replace(/```json|```/g, '').trim();
+      let parsed;
+      try { parsed = JSON.parse(cleaned); } catch (e) { throw new Error('JSONパース失敗: ' + cleaned.substring(0, 200)); }
+      renderResult(parsed);
+      showScreen('screen-result');
+    } catch (e) {
+      clearInterval(interval);
+      showScreen('screen-questions');
+      document.getElementById('q-error').textContent = 'エラー: ' + e.message;
+      document.getElementById('q-error').style.display = 'block';
+    }
+  }
+
+  function renderCoverItems(items, priorityClass, priorityLabel) {
+    return items.map(item => `
+      <div class="cover-item">
+        <div class="cover-priority ${priorityClass}">${priorityLabel}</div>
+        <div style="flex:1">
+          <div class="cover-type">${item.type}</div>
+          <div class="cover-name">${item.name}</div>
+          <div class="cover-reason">${item.reason}</div>
+          <div class="cover-point">確認ポイント：${item.point}</div>
+        </div>
+      </div>
+    `).join('');
+  }
+
+  function renderResult(result) {
+    document.getElementById('result-profile').textContent = result.profile;
+    document.getElementById('result-high').innerHTML = renderCoverItems(result.high, 'priority-high', '優先');
+    document.getElementById('result-mid').innerHTML  = renderCoverItems(result.mid,  'priority-mid',  '検討');
+    document.getElementById('result-low').innerHTML  = renderCoverItems(result.low,  'priority-low',  '将来');
+  }
+
+  function reset() {
+    answers.q1 = ''; answers.q2 = ''; answers.q3 = '';
+    preData.age = ''; preData.family = ''; preData.insurance = '';
+    document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+    document.getElementById('btn-pre').disabled = true;
+    currentQ = 0;
+    showScreen('screen-intro');
+  }
+</script>
+</body>
+</html>
